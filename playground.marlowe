@@ -1,0 +1,222 @@
+When
+    [Case
+        (Choice
+            (ChoiceId
+                "AmountToDeposit"
+                (Role "MergedCompanyFund")
+            )
+            [Bound 1 1000000000000000000000000]
+        )
+        (Let
+            "AmountAvailableForMerge"
+            (ChoiceValue
+                (ChoiceId
+                    "AmountToDeposit"
+                    (Role "MergedCompanyFund")
+                ))
+            (When
+                [Case
+                    (Deposit
+                        (Role "PooledAssets")
+                        (Role "MergedCompanyFund")
+                        (Token "1291" "GovA/GovB")
+                        (UseValue "AmountAvailableForMerge")
+                    )
+                    (When
+                        [Case
+                            (Deposit
+                                (Role "CompanyAAssets")
+                                (Role "Shareholder")
+                                (Token "1232" "AssetA")
+                                (Constant 100000000)
+                            )
+                            (When
+                                [Case
+                                    (Deposit
+                                        (Role "CompanyBAssets")
+                                        (Role "Shareholder")
+                                        (Token "234234" "AssetB")
+                                        (Constant 100000000)
+                                    )
+                                    (When
+                                        [Case
+                                            (Choice
+                                                (ChoiceId
+                                                    "AssetAPerAssetB1"
+                                                    (Role "OnChainOracle")
+                                                )
+                                                [Bound 1 100000000000]
+                                            )
+                                            (When
+                                                [Case
+                                                    (Choice
+                                                        (ChoiceId
+                                                            "AssetAPerAssetB2"
+                                                            (Role "OnChainOracle")
+                                                        )
+                                                        [Bound 1 100000000000]
+                                                    )
+                                                    (If
+                                                        (ValueGT
+                                                            (ChoiceValue
+                                                                (ChoiceId
+                                                                    "AssetAPerAssetB1"
+                                                                    (Role "OnChainOracle")
+                                                                ))
+                                                            (ChoiceValue
+                                                                (ChoiceId
+                                                                    "AssetAPerAssetB2"
+                                                                    (Role "OnChainOracle")
+                                                                ))
+                                                        )
+                                                        (Let
+                                                            "AverageValueOfAInB"
+                                                            (Scale
+                                                                (1%2)
+                                                                (AddValue
+                                                                    (SubValue
+                                                                        (ChoiceValue
+                                                                            (ChoiceId
+                                                                                "AssetAPerAssetB1"
+                                                                                (Role "OnChainOracle")
+                                                                            ))
+                                                                        (ChoiceValue
+                                                                            (ChoiceId
+                                                                                "AssetAPerAssetB2"
+                                                                                (Role "OnChainOracle")
+                                                                            ))
+                                                                    )
+                                                                    (ChoiceValue
+                                                                        (ChoiceId
+                                                                            "AssetAPerAssetB2"
+                                                                            (Role "OnChainOracle")
+                                                                        ))
+                                                                )
+                                                            )
+                                                            (If
+                                                                (ValueGT
+                                                                    (UseValue "AmountAvailableForMerge")
+                                                                    (MulValue
+                                                                        (Constant 100000000)
+                                                                        (UseValue "AverageValueOfAInB")
+                                                                    )
+                                                                )
+                                                                (Pay
+                                                                    (Role "PooledAssets")
+                                                                    (Account (Role "Shareholder"))
+                                                                    (Token "1291" "GovA/GovB")
+                                                                    (MulValue
+                                                                        (Constant 100000000)
+                                                                        (UseValue "AverageValueOfAInB")
+                                                                    )
+                                                                    (Pay
+                                                                        (Role "PooledAssets")
+                                                                        (Party (Role "MergedCompanyFund"))
+                                                                        (Token "1291" "GovA/GovB")
+                                                                        (SubValue
+                                                                            (UseValue "AmountAvailableForMerge")
+                                                                            (MulValue
+                                                                                (Constant 100000000)
+                                                                                (UseValue "AverageValueOfAInB")
+                                                                            )
+                                                                        )
+                                                                        (Pay
+                                                                            (Role "CompanyAAssets")
+                                                                            (Party (PK "0000000000000000000000000000000000000000000000000000000000000000"))
+                                                                            (Token "1232" "AssetA")
+                                                                            (Constant 100000000)
+                                                                            (Pay
+                                                                                (Role "CompanyBAssets")
+                                                                                (Party (PK "0000000000000000000000000000000000000000000000000000000000000000"))
+                                                                                (Token "234234" "AssetB")
+                                                                                (Constant 100000000)
+                                                                                Close 
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                                Close 
+                                                            )
+                                                        )
+                                                        (Let
+                                                            "AverageValueOfAInB"
+                                                            (Scale
+                                                                (1%2)
+                                                                (AddValue
+                                                                    (SubValue
+                                                                        (ChoiceValue
+                                                                            (ChoiceId
+                                                                                "AssetAPerAssetB2"
+                                                                                (Role "OnChainOracle")
+                                                                            ))
+                                                                        (ChoiceValue
+                                                                            (ChoiceId
+                                                                                "AssetAPerAssetB1"
+                                                                                (Role "OnChainOracle")
+                                                                            ))
+                                                                    )
+                                                                    (ChoiceValue
+                                                                        (ChoiceId
+                                                                            "AssetAPerAssetB1"
+                                                                            (Role "OnChainOracle")
+                                                                        ))
+                                                                )
+                                                            )
+                                                            (If
+                                                                (ValueGT
+                                                                    (UseValue "AmountAvailableForMerge")
+                                                                    (MulValue
+                                                                        (Constant 100000000)
+                                                                        (UseValue "AverageValueOfAInB")
+                                                                    )
+                                                                )
+                                                                (Pay
+                                                                    (Role "PooledAssets")
+                                                                    (Account (Role "Shareholder"))
+                                                                    (Token "1291" "GovA/GovB")
+                                                                    (MulValue
+                                                                        (Constant 100000000)
+                                                                        (UseValue "AverageValueOfAInB")
+                                                                    )
+                                                                    (Pay
+                                                                        (Role "PooledAssets")
+                                                                        (Party (Role "MergedCompanyFund"))
+                                                                        (Token "1291" "GovA/GovB")
+                                                                        (SubValue
+                                                                            (UseValue "AmountAvailableForMerge")
+                                                                            (MulValue
+                                                                                (Constant 100000000)
+                                                                                (UseValue "AverageValueOfAInB")
+                                                                            )
+                                                                        )
+                                                                        (Pay
+                                                                            (Role "CompanyAAssets")
+                                                                            (Party (PK "0000000000000000000000000000000000000000000000000000000000000000"))
+                                                                            (Token "1232" "AssetA")
+                                                                            (Constant 100000000)
+                                                                            (Pay
+                                                                                (Role "CompanyBAssets")
+                                                                                (Party (PK "0000000000000000000000000000000000000000000000000000000000000000"))
+                                                                                (Token "234234" "AssetB")
+                                                                                (Constant 100000000)
+                                                                                Close 
+                                                                            )
+                                                                        )
+                                                                    )
+                                                                )
+                                                                Close 
+                                                            )
+                                                        )
+                                                    )]
+                                                150 Close 
+                                            )]
+                                        120 Close 
+                                    )]
+                                90 Close 
+                            )]
+                        60 Close 
+                    )]
+                30 Close 
+            )
+        )]
+    15 Close 
